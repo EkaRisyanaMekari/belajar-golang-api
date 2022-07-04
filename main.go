@@ -11,7 +11,7 @@ func main() {
 
 	router.GET("/", rootHandler)
 	router.GET("/hello", helloHandler)
-	router.GET("/books/:id", booksHandler)
+	router.GET("/books/:id/:title", booksHandler)
 	router.GET("/book-detail", bookDetailHandler)
 	router.Run()
 }
@@ -33,16 +33,18 @@ func helloHandler(c *gin.Context) {
 
 func booksHandler(c *gin.Context) {
 	id := c.Param("id")
+	title := c.Param("title")
 	c.JSON(http.StatusOK, gin.H{
-		"id":       id,
-		"content":  "judul",
-		"subtitle": "subjudul",
+		"id":    id,
+		"title": title,
 	})
 }
 
 func bookDetailHandler(c *gin.Context) {
 	title := c.Query("title")
+	id := c.Query("id")
 	c.JSON(http.StatusOK, gin.H{
+		"id":    id,
 		"title": title,
 	})
 }
