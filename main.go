@@ -6,45 +6,38 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Todo struct {
+	ID          float64 `json:"id"`
+	Description string  `json:"description"`
+	Status      bool    `json:"status"`
+}
+
+var todoID float64 = 4
+var todos = []Todo{
+	{ID: 1, Description: "learn golang", Status: false},
+	{ID: 2, Description: "go to gym", Status: false},
+	{ID: 3, Description: "cook breakfast", Status: false},
+}
+
 func main() {
 	router := gin.Default()
 
-	router.GET("/", rootHandler)
-	router.GET("/hello", helloHandler)
-	router.GET("/books/:id/:title", booksHandler)
-	router.GET("/book-detail", bookDetailHandler)
-	router.Run()
+	router.GET("/todos", getTodosHandler)
+	router.POST("/todos", postTodoHandler)
+
+	router.Run(":7777")
 }
 
-func rootHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"name": "Eka",
-		"bio":  "Software Developer",
-	})
-
+func getTodosHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, todos)
 }
 
-func helloHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"content":  "judul",
-		"subtitle": "subjudul",
-	})
-}
-
-func booksHandler(c *gin.Context) {
-	id := c.Param("id")
-	title := c.Param("title")
-	c.JSON(http.StatusOK, gin.H{
-		"id":    id,
-		"title": title,
-	})
-}
-
-func bookDetailHandler(c *gin.Context) {
-	title := c.Query("title")
-	id := c.Query("id")
-	c.JSON(http.StatusOK, gin.H{
-		"id":    id,
-		"title": title,
-	})
+func postTodoHandler(c *gin.Context) {
+	var newTodo Todo
+	if err := c.BindJSON(&newTodo); err != nil {
+		return
+	}
+	newTodo.ID = todoID + 1
+	todos = append(todos, newTodo)
+	c.JSON(http.StatusOK, todos)
 }
