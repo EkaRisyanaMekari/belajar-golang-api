@@ -16,7 +16,7 @@ type Todo struct {
 var todoID int = 4
 var todos = []Todo{
 	{ID: 1, Description: "learn golang", Status: false},
-	{ID: 2, Description: "go to gym", Status: false},
+	{ID: 2, Description: "go to gym", Status: true},
 	{ID: 3, Description: "cook breakfast", Status: false},
 }
 
@@ -24,6 +24,7 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/todos", getTodosHandler)
+	router.GET("/todos/outstanding", getTodosOutstandingHandler)
 	router.POST("/todos", postTodoHandler)
 	router.DELETE("/todos/:id", deleteTodoHandler)
 
@@ -34,12 +35,18 @@ func getTodosHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, todos)
 }
 
+func getTodosOutstandingHandler(c *gin.Context) {
+	outstandingTodo := filter(todos, func(todo Todo) bool { return !todo.Status })
+	c.JSON(http.StatusOK, outstandingTodo)
+}
+
 func postTodoHandler(c *gin.Context) {
 	var newTodo Todo
 	if err := c.BindJSON(&newTodo); err != nil {
 		return
 	}
 	newTodo.ID = todoID + 1
+	newTodo.Status = false
 	todos = append(todos, newTodo)
 	c.JSON(http.StatusOK, todos)
 }
