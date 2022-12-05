@@ -2,17 +2,18 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Todo struct {
-	ID          float64 `json:"id"`
-	Description string  `json:"description"`
-	Status      bool    `json:"status"`
+	ID          int    `json:"id"`
+	Description string `json:"description"`
+	Status      bool   `json:"status"`
 }
 
-var todoID float64 = 4
+var todoID int = 4
 var todos = []Todo{
 	{ID: 1, Description: "learn golang", Status: false},
 	{ID: 2, Description: "go to gym", Status: false},
@@ -24,6 +25,7 @@ func main() {
 
 	router.GET("/todos", getTodosHandler)
 	router.POST("/todos", postTodoHandler)
+	router.DELETE("/todos/:id", deleteTodoHandler)
 
 	router.Run(":7777")
 }
@@ -40,4 +42,29 @@ func postTodoHandler(c *gin.Context) {
 	newTodo.ID = todoID + 1
 	todos = append(todos, newTodo)
 	c.JSON(http.StatusOK, todos)
+}
+
+func deleteTodoHandler(c *gin.Context) {
+	var deletedID = c.Param("id")
+	filteredTodo := filter(todos, func(todo Todo) bool {
+		id, err := strconv.Atoi(deletedID)
+		if err != nil {
+			panic(err)
+		}
+		return todo.ID != id
+	})
+
+	c.JSON(http.StatusOK, filteredTodo)
+}
+
+type filterFunc func(Todo) bool
+
+func filter(todos []Todo, f filterFunc) []Todo {
+	var filtered []Todo
+	for _, todo := range todos {
+		if f(todo) {
+			filtered = append(filtered, todo)
+		}
+	}
+	return filtered
 }
