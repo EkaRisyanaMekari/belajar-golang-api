@@ -45,7 +45,8 @@ func postTodoHandler(c *gin.Context) {
 	if err := c.BindJSON(&newTodo); err != nil {
 		return
 	}
-	newTodo.ID = todoID + 1
+	todoID = todoID + 1
+	newTodo.ID = todoID
 	newTodo.Status = false
 	todos = append(todos, newTodo)
 	c.JSON(http.StatusOK, todos)
@@ -61,7 +62,8 @@ func deleteTodoHandler(c *gin.Context) {
 		return todo.ID != id
 	})
 
-	c.JSON(http.StatusOK, filteredTodo)
+	todos = filteredTodo
+	c.JSON(http.StatusOK, todos)
 }
 
 type filterFunc func(Todo) bool
