@@ -27,6 +27,7 @@ func main() {
 	router.GET("/todos/outstanding", getTodosOutstandingHandler)
 	router.POST("/todos", postTodoHandler)
 	router.DELETE("/todos/:id", deleteTodoHandler)
+	router.PATCH("/todos/:id", updateTodoHandler)
 
 	router.Run(":7777")
 }
@@ -63,6 +64,27 @@ func deleteTodoHandler(c *gin.Context) {
 	})
 
 	todos = filteredTodo
+	c.JSON(http.StatusOK, todos)
+}
+
+func updateTodoHandler(c *gin.Context) {
+	updatedId, err1 := strconv.Atoi(c.Param("id"))
+	if err1 != nil {
+		panic(err1)
+	}
+	var updatedTodo Todo
+	if err := c.BindJSON(&updatedTodo); err != nil {
+		return
+	}
+
+	for i := 0; i < len(todos); i++ {
+		var localTodo Todo = todos[i]
+		if localTodo.ID == updatedId {
+			todos[i].Description = updatedTodo.Description
+			todos[i].Status = updatedTodo.Status
+			break
+		}
+	}
 	c.JSON(http.StatusOK, todos)
 }
 
