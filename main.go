@@ -1,16 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type Todo struct {
 	ID          int    `json:"id"`
-	Description string `json:"description"`
-	Status      bool   `json:"status"`
+	Description string `json:"description" binding:"required"`
+	Status      bool   `json:"status" binding:"required"`
 }
 
 var todoID int = 4
@@ -41,9 +43,19 @@ func getTodosOutstandingHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, outstandingTodo)
 }
 
+func buildErrorMessages(err error) []string {
+	var errMessages = []string{}
+	for _, e := range err.(validator.ValidationErrors) {
+		message := fmt.Sprintf("Error field %s [%s].", e.Field(), e.ActualTag())
+		errMessages = append(errMessages, message)
+	}
+	return errMessages
+}
+
 func postTodoHandler(c *gin.Context) {
 	var newTodo Todo
-	if err := c.BindJSON(&newTodo); err != nil {
+	if err := c.ShouldBindJSON(&newTodo); err != nil {
+		c.JSON(http.StatusBadRequest, buildErrorMessages(err))
 		return
 	}
 	todoID = todoID + 1
@@ -73,7 +85,8 @@ func updateTodoHandler(c *gin.Context) {
 		panic(err1)
 	}
 	var updatedTodo Todo
-	if err := c.BindJSON(&updatedTodo); err != nil {
+	if err := c.ShouldBindJSON(&updatedTodo); err != nil {
+		c.JSON(http.StatusBadRequest, buildErrorMessages(err))
 		return
 	}
 
