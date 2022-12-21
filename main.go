@@ -55,7 +55,7 @@ func buildErrorMessages(err error) []string {
 func postTodoHandler(c *gin.Context) {
 	var newTodo Todo
 	if err := c.ShouldBindJSON(&newTodo); err != nil {
-		c.JSON(http.StatusBadRequest, buildErrorMessages(err))
+		c.JSON(http.StatusBadRequest, gin.H{"errors": buildErrorMessages(err)})
 		return
 	}
 	todoID = todoID + 1
@@ -86,7 +86,7 @@ func updateTodoHandler(c *gin.Context) {
 	}
 	var updatedTodo Todo
 	if err := c.ShouldBindJSON(&updatedTodo); err != nil {
-		c.JSON(http.StatusBadRequest, buildErrorMessages(err))
+		c.JSON(http.StatusBadRequest, gin.H{"errors": buildErrorMessages(err)})
 		return
 	}
 
