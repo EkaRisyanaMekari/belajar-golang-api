@@ -24,12 +24,13 @@ var todos = []Todo{
 
 func main() {
 	router := gin.Default()
+	v1 := router.Group("/v1")
 
-	router.GET("/todos", getTodosHandler)
-	router.GET("/todos/outstanding", getTodosOutstandingHandler)
-	router.POST("/todos", postTodoHandler)
-	router.DELETE("/todos/:id", deleteTodoHandler)
-	router.PATCH("/todos/:id", updateTodoHandler)
+	v1.GET("/todos", getTodosHandler)
+	v1.GET("/todos/outstanding", getTodosOutstandingHandler)
+	v1.POST("/todos", postTodoHandler)
+	v1.DELETE("/todos/:id", deleteTodoHandler)
+	v1.PATCH("/todos/:id", updateTodoHandler)
 
 	router.Run(":7777")
 }
