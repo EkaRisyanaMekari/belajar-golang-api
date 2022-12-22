@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var Todos = []todo.Todo{}
+var Todos = []todo.TodoInput{}
 var TodoID int
 
 func GetTodosHandler(c *gin.Context) {
@@ -17,12 +17,12 @@ func GetTodosHandler(c *gin.Context) {
 }
 
 func GetTodosOutstandingHandler(c *gin.Context) {
-	outstandingTodo := Filter(Todos, func(todo todo.Todo) bool { return !todo.Status })
+	outstandingTodo := Filter(Todos, func(todo todo.TodoInput) bool { return !todo.Status })
 	c.JSON(http.StatusOK, outstandingTodo)
 }
 
 func PostTodoHandler(c *gin.Context) {
-	var newTodo todo.Todo
+	var newTodo todo.TodoInput
 	if err := c.ShouldBindJSON(&newTodo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"errors": BuildErrorMessages(err)})
 		return
@@ -36,7 +36,7 @@ func PostTodoHandler(c *gin.Context) {
 
 func DeleteTodoHandler(c *gin.Context) {
 	var deletedID = c.Param("id")
-	filteredTodo := Filter(Todos, func(todo todo.Todo) bool {
+	filteredTodo := Filter(Todos, func(todo todo.TodoInput) bool {
 		id, err := strconv.Atoi(deletedID)
 		if err != nil {
 			panic(err)
@@ -53,14 +53,14 @@ func UpdateTodoHandler(c *gin.Context) {
 	if err1 != nil {
 		panic(err1)
 	}
-	var updatedTodo todo.Todo
+	var updatedTodo todo.TodoInput
 	if err := c.ShouldBindJSON(&updatedTodo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"errors": BuildErrorMessages(err)})
 		return
 	}
 
 	for i := 0; i < len(Todos); i++ {
-		var localTodo todo.Todo = Todos[i]
+		var localTodo todo.TodoInput = Todos[i]
 		if localTodo.ID == updatedId {
 			Todos[i].Description = updatedTodo.Description
 			Todos[i].Status = updatedTodo.Status

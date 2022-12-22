@@ -16,10 +16,10 @@ func BuildErrorMessages(err error) []string {
 	return errMessages
 }
 
-type filterFunc func(todo.Todo) bool
+type filterFunc func(todo.TodoInput) bool
 
-func Filter(todos []todo.Todo, f filterFunc) []todo.Todo {
-	var filtered []todo.Todo
+func Filter(todos []todo.TodoInput, f filterFunc) []todo.TodoInput {
+	var filtered []todo.TodoInput
 	for _, todo := range todos {
 		if f(todo) {
 			filtered = append(filtered, todo)
