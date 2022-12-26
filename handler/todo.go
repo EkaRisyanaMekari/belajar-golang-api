@@ -7,13 +7,20 @@ import (
 	"belajar-golang-api/todo"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 var Todos = []todo.TodoInput{}
 var TodoID int
+var Db *gorm.DB
 
 func GetTodosHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, Todos)
+	var todos []todo.Todo
+	if err := Db.Find(&todos).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"errors": "error get data"})
+		return
+	}
+	c.JSON(http.StatusOK, todos)
 }
 
 func GetTodosOutstandingHandler(c *gin.Context) {
@@ -22,16 +29,18 @@ func GetTodosOutstandingHandler(c *gin.Context) {
 }
 
 func PostTodoHandler(c *gin.Context) {
-	var newTodo todo.TodoInput
+	var newTodo todo.Todo
 	if err := c.ShouldBindJSON(&newTodo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"errors": BuildErrorMessages(err)})
 		return
 	}
-	TodoID = TodoID + 1
-	newTodo.ID = TodoID
-	newTodo.Status = false
-	Todos = append(Todos, newTodo)
-	c.JSON(http.StatusOK, Todos)
+
+	if err2 := Db.Create(&newTodo).Error; err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"errors": "error insert todo"})
+		return
+	}
+
+	GetTodosHandler(c)
 }
 
 func DeleteTodoHandler(c *gin.Context) {

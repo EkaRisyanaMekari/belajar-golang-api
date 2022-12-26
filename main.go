@@ -31,6 +31,7 @@ func main() {
 
 	handler.TodoID = TodoID
 	handler.Todos = Todos
+	handler.Db = db
 
 	router := gin.Default()
 	v1 := router.Group("/v1")
