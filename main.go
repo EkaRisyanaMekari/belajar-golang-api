@@ -21,11 +21,13 @@ var Todos = []todo.TodoInput{
 
 func main() {
 	dsn := "root:root@tcp(127.0.0.1:3306)/belajar-golang-api?charset=utf8mb4&parseTime=True&loc=Local"
-	_, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Database connection error")
 	}
 	fmt.Println("Database connected !")
+
+	db.AutoMigrate(&todo.Todo{})
 
 	handler.TodoID = TodoID
 	handler.Todos = Todos
